@@ -14,7 +14,7 @@ namespace DEREVO321
     {
         public Redactor(List<string> columnNames)
         {
-            Font coreFont = new Font("Tahoma", 12, FontStyle.Bold);
+            Font coreFont = new Font("Segoe UI", 12, FontStyle.Bold);
             InitializeComponent();
             Button bt = new Button
             {
@@ -36,7 +36,7 @@ namespace DEREVO321
                 };
                 TextBox Tb = new TextBox
                 {
-                    Location = new Point(230, yPos ),
+                    Location = new Point(360, yPos ),
                     Font = coreFont,
                     AutoSize = true
                 };

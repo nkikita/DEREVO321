@@ -11,7 +11,7 @@ using System.Text;
 
 namespace DEREVO321
 {
-   
+
     public partial class MianForm : Form
     {
         private NpgsqlConnection connection;
@@ -64,7 +64,7 @@ namespace DEREVO321
                 }
             }
         }
-       
+
         private void EditItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem clickedItem = sender as ToolStripMenuItem;
@@ -73,7 +73,7 @@ namespace DEREVO321
             {
                 string tableName = clickedItem.Text;
                 NpgsqlDataAdapter dataAdapter = new NpgsqlDataAdapter($"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = {tableName};", connection);
-              
+
 
                 if (connection.State == ConnectionState.Closed)
                 {
@@ -81,9 +81,9 @@ namespace DEREVO321
                 }
                 else
                 {
-                    var columnNames = GetColumnNames(tableName); 
+                    var columnNames = GetColumnNames(tableName);
                     Redactor columnNamesForm = new Redactor(columnNames);
-                    columnNamesForm.Show(); 
+                    columnNamesForm.Show();
                 }
             }
         }
@@ -129,10 +129,8 @@ namespace DEREVO321
                 подключитьсяКБдToolStripMenuItem.Text = "подключиться к бд";
             }
         }
-    
-    
 
-        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        private void MianForm_Load(object sender, EventArgs e)
         {
 
         }
@@ -147,8 +145,4 @@ public class ApplicationDbContext : DbContext
         optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=testdemo;Username=postgres;Password=nikitos");
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        // Дополнительные настройки модели, если это необходимо
-    }
 }
