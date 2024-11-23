@@ -15,8 +15,7 @@ namespace DEREVO321
     public partial class MianForm : Form
     {
         private NpgsqlConnection connection;
-        private string connectionString = "Host=localhost;Port=5432;Database=testdemo;Username=postgres;Password=nikitos";
-        string[] tables = { "Адреса", "Брак", "Директора", "Должность", "Качество", "Материалы", "Партнёры", "Поставщики", "Продукция", "Производство", "Сотрудники", "Тип_продукции" };
+        private string connectionString = "Host=localhost;Port=5432;Database=DEMO;Username=postgres;Password=nikitos";
 
         private DataGridView dataGridView;
         public MianForm()
@@ -30,7 +29,7 @@ namespace DEREVO321
             dataGridView.Left = 20;
             dataGridView.BackgroundColor = Color.LightBlue;
             this.Controls.Add(dataGridView);
-
+            string[] tables = GetTableNames();
             for (int i = 0; i < tables.Length; i++)
             {
                 ToolStripMenuItem openItem = new ToolStripMenuItem(tables[i]);
@@ -68,7 +67,7 @@ namespace DEREVO321
         private void EditItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem clickedItem = sender as ToolStripMenuItem;
-
+            var dbContext = new ApplicationContext();
             if (clickedItem != null)
             {
                 string tableName = clickedItem.Text;
@@ -82,7 +81,7 @@ namespace DEREVO321
                 else
                 {
                     var columnNames = GetColumnNames(tableName);
-                    Redactor columnNamesForm = new Redactor(columnNames);
+                    Redactor columnNamesForm = new Redactor(columnNames, tableName, dbContext);
                     columnNamesForm.Show();
                 }
             }
@@ -110,6 +109,33 @@ namespace DEREVO321
             }
             return columnNames;
         }
+
+        public string[] GetTableNames()
+        {
+            var tableNames = new List<string>(); 
+
+            using (var context = new ApplicationDbContext())
+            {
+                context.Database.OpenConnection();
+
+                using (var command = context.Database.GetDbConnection().CreateCommand())
+                {
+                    // SQL-запрос для получения списка таблиц
+                    command.CommandText = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            tableNames.Add(reader.GetString(0));
+                        }
+                    }
+                }
+            }
+
+            return tableNames.ToArray(); 
+        }
+
 
 
         private void подключитьсяКБдToolStripMenuItem_Click(object sender, EventArgs e)
@@ -142,7 +168,7 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=testdemo;Username=postgres;Password=nikitos");
+        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=DEMO;Username=postgres;Password=nikitos");
     }
 
 }
