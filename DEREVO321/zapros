@@ -1,0 +1,156 @@
+-- Должность
+CREATE TABLE Должность (
+    ID_должности SERIAL PRIMARY KEY,
+    название_должности VARCHAR(255) NOT NULL,
+    Допуск BOOLEAN
+);
+
+-- Поставщики
+CREATE TABLE Поставщики (
+    ID_Поставщика SERIAL PRIMARY KEY,
+    Тип VARCHAR(255) NOT NULL,
+    Наименование VARCHAR(255) NOT NULL,
+    ИНН BIGINT UNIQUE NOT NULL,
+    История_поставок TEXT
+);
+
+-- Тип продукции
+CREATE TABLE Тип_продукции (
+    ID_Тип_продукции SERIAL PRIMARY KEY,
+    Тип VARCHAR(255) NOT NULL
+);
+
+-- Материалы
+CREATE TABLE Материалы (
+    ID_Материала SERIAL PRIMARY KEY,
+    ID_Тип_продукции INT REFERENCES Тип_продукции(ID_Тип_продукции),
+    Наименование VARCHAR(255) NOT NULL,
+    Артикул BIGINT UNIQUE NOT NULL,
+    Мин_Ст_для_парт NUMERIC(10, 2),
+    ID_Поставщика INT REFERENCES Поставщики(ID_Поставщика),
+    Кол_во_упаковки INT,
+    Ед_измерения VARCHAR(50),
+    Изображение TEXT,
+    Мин_кол_во_на_складе INT,
+    История_изменений TEXT,
+    Стоимость NUMERIC(10, 2),
+    Резервация INT
+);
+
+-- Требуемые материалы
+CREATE TABLE Требуемые_материалы (
+    ID_Требуемых_материалов SERIAL PRIMARY KEY,
+    ID_Материала INT REFERENCES Материалы(ID_Материала)
+);
+
+-- Качество
+CREATE TABLE Качество (
+    ID_Качества SERIAL PRIMARY KEY,
+    Сертификат_качества TEXT,
+    номер_стандарта VARCHAR(50)
+);
+
+-- Производство
+CREATE TABLE Производство (
+    ID_Производства SERIAL PRIMARY KEY,
+    Себестоимость NUMERIC(10, 2),
+    Номер_цеха INT,
+    Кол_во_человек_на_произ INT,
+    ID_требуемых_материалов INT REFERENCES Требуемые_материалы(ID_Требуемых_материалов)
+);
+
+-- Адреса (Партнёров)
+CREATE TABLE Адреса (
+    ID_Адреса SERIAL PRIMARY KEY,
+    Почтовый_индекс INT,
+    Область VARCHAR(255),
+    Город VARCHAR(255),
+    Улица VARCHAR(255),
+    Дом INT,
+    ИНН BIGINT UNIQUE
+);
+
+-- Директора (Партнёров)
+CREATE TABLE Директора (
+    ID_Директора SERIAL PRIMARY KEY,
+    Фамилия VARCHAR(255),
+    Имя VARCHAR(255),
+    Отчество VARCHAR(255),
+    Эл_почта VARCHAR(255),
+    Телефон BIGINT
+);
+
+-- Партнёры
+CREATE TABLE Партнёры (
+    ID_Партнёра SERIAL PRIMARY KEY,
+    Название_партёра VARCHAR(255),
+    ID_директора INT REFERENCES Директора(ID_Директора),
+    Рейтинг INT,
+    ID_Адреса INT REFERENCES Адреса(ID_Адреса)
+);
+
+-- Сотрудники
+CREATE TABLE Сотрудники (
+    ID_Сотрудника SERIAL PRIMARY KEY,
+    Фамилия VARCHAR(255),
+    Имя VARCHAR(255),
+    Отчество VARCHAR(255),
+    Серия INT,
+    Номер BIGINT,
+    Номер_карты BIGINT UNIQUE,
+    наличие_семьи BOOLEAN,
+    состояние_здоровья TEXT,
+    ID_должности INT REFERENCES Должность(ID_должности),
+    на_работе_ли BOOLEAN
+);
+
+-- Брак
+CREATE TABLE Брак (
+    ID SERIAL PRIMARY KEY,
+    Процент_брака NUMERIC(5, 2),
+    ID_Тип_материала INT REFERENCES Материалы(ID_Материала)
+);
+
+-- Продукция
+CREATE TABLE Продукция (
+    ID_продукции SERIAL PRIMARY KEY,
+    Артикул BIGINT UNIQUE NOT NULL,
+    Наименование VARCHAR(255) NOT NULL,
+    Описание TEXT,
+    Размер_упаковки INT,
+    ID_Тип_продукции INT REFERENCES Тип_продукции(ID_Тип_продукции),
+    ID_Поставщика INT REFERENCES Поставщики(ID_Поставщика),
+    ID_Качества INT REFERENCES Качество(ID_Качества),
+    Цена_для_парт NUMERIC(10, 2),
+    Время_изготовления INT,
+    ID_Производства INT REFERENCES Производство(ID_Производства)
+);
+
+-- Поставки
+CREATE TABLE Поставки (
+    ID_поставки SERIAL PRIMARY KEY,
+    Название_поставки VARCHAR(255)
+);
+
+-- Резервация
+CREATE TABLE Резервация (
+    ID_Резервации SERIAL PRIMARY KEY,
+    Резервация TEXT
+);
+
+-- Пример вставки данных
+INSERT INTO Адреса (Почтовый_индекс, Область, Город, Улица, Дом, ИНН)
+VALUES 
+(652050, 'Кемеровская область', 'Юрга', 'Лесная', 15, 2222455179),
+(164500, 'Архангельская область', 'Северодвинск', 'Строителей', 18, 3333888520),
+(188910, 'Ленинградская область', 'Приморск', 'Парковая', 21, 4440391035),
+(143960, 'Московская область', 'Реутов', 'Свободы', 51, 1111520857),
+(309500, 'Белгородская область', 'Старый Оскол', 'Рабочая', 122, 5552431140);
+
+INSERT INTO Директора (Фамилия, Имя, Отчество, Эл_почта, Телефон)
+VALUES 
+('Иванова', 'Александра', 'Ивановна', 'aleksandraivanova@ml.ru', 4931234567),
+('Петров', 'Василий', 'Петрович', 'vppetrov@vl.ru', 9871235678),
+('Соловьев', 'Андрей', 'Николаевич', 'ansolovev@st.ru', 8122233200),
+('Воробьева', 'Екатерина', 'Валерьевна', 'ekaterina.vorobeva@ml.ru', 4442223311),
+('Степанов', 'Степан', 'Сергеевич', 'stepanov@stepan.ru', 9128883333);
