@@ -15,7 +15,11 @@ namespace DEREVO321
     public partial class MianForm : Form
     {
         private NpgsqlConnection connection;
+<<<<<<< HEAD
 
+=======
+        private string connectionString = "Host=localhost;Port=5432;Database=DEMO;Username=postgres;Password=nikitos";
+>>>>>>> 2cfd712cf51c423a54ff441844a3e92136468d34
 
         private DataGridView dataGridView;
         public MianForm()
@@ -112,7 +116,35 @@ namespace DEREVO321
 
         public string[] GetTableNames()
         {
+<<<<<<< HEAD
             var tableNames = new List<string>();
+=======
+            var tableNames = new List<string>(); 
+
+            using (var context = new ApplicationDbContext())
+            {
+                context.Database.OpenConnection();
+
+                using (var command = context.Database.GetDbConnection().CreateCommand())
+                {
+                    // SQL-запрос для получения списка таблиц
+                    command.CommandText = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            tableNames.Add(reader.GetString(0));
+                        }
+                    }
+                }
+            }
+
+            return tableNames.ToArray(); 
+        }
+
+
+>>>>>>> 2cfd712cf51c423a54ff441844a3e92136468d34
 
             using (var context = new ApplicationDbContext())
             {
@@ -189,7 +221,11 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+<<<<<<< HEAD
         optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=DerevoTestDatabase;Username=postgres;Password=nikitos");
+=======
+        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=DEMO;Username=postgres;Password=nikitos");
+>>>>>>> 2cfd712cf51c423a54ff441844a3e92136468d34
     }
 
 }
