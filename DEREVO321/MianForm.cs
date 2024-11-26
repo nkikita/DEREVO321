@@ -7,16 +7,15 @@ using System.Data;
 using System.Windows.Forms;
 using System.Diagnostics.Eventing.Reader;
 using System.Text;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 
 namespace DEREVO321
 {
-
     public partial class MianForm : Form
     {
         private NpgsqlConnection connection;
-        private string connectionString = "Host=localhost;Port=5432;Database=testdemo;Username=postgres;Password=nikitos";
-        string[] tables = { "Адреса", "Брак", "Директора", "Должность", "Качество", "Материалы", "Партнёры", "Поставщики", "Продукция", "Производство", "Сотрудники", "Тип_продукции" };
+
 
         private DataGridView dataGridView;
         public MianForm()
@@ -30,7 +29,7 @@ namespace DEREVO321
             dataGridView.Left = 20;
             dataGridView.BackgroundColor = Color.LightBlue;
             this.Controls.Add(dataGridView);
-
+            string[] tables = GetTableNames();
             for (int i = 0; i < tables.Length; i++)
             {
                 ToolStripMenuItem openItem = new ToolStripMenuItem(tables[i]);
@@ -68,7 +67,7 @@ namespace DEREVO321
         private void EditItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem clickedItem = sender as ToolStripMenuItem;
-
+            var dbContext = new ApplicationContext();
             if (clickedItem != null)
             {
                 string tableName = clickedItem.Text;
@@ -82,7 +81,7 @@ namespace DEREVO321
                 else
                 {
                     var columnNames = GetColumnNames(tableName);
-                    Redactor columnNamesForm = new Redactor(columnNames);
+                    Redactor columnNamesForm = new Redactor(columnNames, tableName, dbContext);
                     columnNamesForm.Show();
                 }
             }
@@ -111,18 +110,66 @@ namespace DEREVO321
             return columnNames;
         }
 
+        public string[] GetTableNames()
+        {
+            var tableNames = new List<string>();
 
+            using (var context = new ApplicationDbContext())
+            {
+                context.Database.OpenConnection();
+
+                using (var command = context.Database.GetDbConnection().CreateCommand())
+                {
+                    // SQL-запрос для получения списка таблиц
+                    command.CommandText = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            tableNames.Add(reader.GetString(0));
+                        }
+                    }
+                }
+            }
+
+            return tableNames.ToArray();
+        }
         private void подключитьсяКБдToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            string name = textBox1.Text.Trim();
+            string password = textBox2.Text.Trim();
             if (подключитьсяКБдToolStripMenuItem.Text == "подключиться к бд")
             {
-                connection = new NpgsqlConnection(connectionString);
-                connection.Open();
-                MessageBox.Show("Подключение к базе данных PostgreSQL успешно!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                подключитьсяКБдToolStripMenuItem.Text = "Отключиться от БД";
+
+                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(password))
+                {
+                    MessageBox.Show("Пожалуйста, заполните все поля.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                try
+                {
+                    string connectionString = $"Host=localhost;Port=5432;Database=DerevoTestDatabase;Username={name};Password={password}";
+                    connection = new NpgsqlConnection(connectionString);
+                    connection.Open();
+                    MessageBox.Show("Подключение успешно!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    подключитьсяКБдToolStripMenuItem.Text = "Отключиться от БД";
+                    textBox1.Hide();
+                    textBox2.Hide();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка подключения: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
             else if (подключитьсяКБдToolStripMenuItem.Text == "Отключиться от БД")
             {
+
+                textBox1.Clear();
+                textBox2.Clear();
+                textBox1.Show();
+                textBox2.Show();
                 connection.Close();
                 dataGridView.DataSource = null;
                 MessageBox.Show("Отключене от базы данных PostgreSQL успешно!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -142,7 +189,7 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=testdemo;Username=postgres;Password=nikitos");
+        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=DerevoTestDatabase;Username=postgres;Password=nikitos");
     }
 
 }

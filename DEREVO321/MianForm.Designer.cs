@@ -33,6 +33,8 @@
             подключитьсяКБдToolStripMenuItem = new ToolStripMenuItem();
             открытьТаблицыToolStripMenuItem = new ToolStripMenuItem();
             редактированиеToolStripMenuItem = new ToolStripMenuItem();
+            textBox1 = new TextBox();
+            textBox2 = new TextBox();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -69,6 +71,22 @@
             редактированиеToolStripMenuItem.Size = new Size(192, 32);
             редактированиеToolStripMenuItem.Text = "редактирование";
             // 
+            // textBox1
+            // 
+            textBox1.Location = new Point(989, 477);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(125, 27);
+            textBox1.TabIndex = 1;
+            textBox1.Text = "Login";
+            // 
+            // textBox2
+            // 
+            textBox2.Location = new Point(989, 510);
+            textBox2.Name = "textBox2";
+            textBox2.Size = new Size(125, 27);
+            textBox2.TabIndex = 2;
+            textBox2.Text = "Password";
+            // 
             // MianForm
             // 
             AllowDrop = true;
@@ -76,6 +94,8 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(244, 232, 211);
             ClientSize = new Size(1126, 541);
+            Controls.Add(textBox2);
+            Controls.Add(textBox1);
             Controls.Add(menuStrip1);
             Cursor = Cursors.SizeAll;
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -96,5 +116,7 @@
         private ToolStripMenuItem открытьТаблицыToolStripMenuItem;
         private ToolStripMenuItem редактированиеToolStripMenuItem;
         private ToolStripMenuItem подключитьсяКБдToolStripMenuItem;
+        private TextBox textBox1;
+        private TextBox textBox2;
     }
 }
