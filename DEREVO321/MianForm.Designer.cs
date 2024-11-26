@@ -77,7 +77,6 @@
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(125, 27);
             textBox1.TabIndex = 1;
-            textBox1.Text = "Login";
             // 
             // textBox2
             // 
@@ -85,7 +84,6 @@
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(125, 27);
             textBox2.TabIndex = 2;
-            textBox2.Text = "Password";
             // 
             // MianForm
             // 
